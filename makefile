@@ -1,10 +1,12 @@
-clock1.o: clock1.c
-	avr-gcc -c -o wusel.o -Os -mmcu=atmega32  wusel.c
+wusel.o: wusel.c
+	avr-gcc -c -o wusel.o -Os -mmcu=atmega32u4  wusel.c
 
-clock1.elf: clock1.o
-	avr-gcc -mmcu=atmega32 -o wusel.elf wusel.o
+wusel.elf: wusel.o
+	avr-gcc -mmcu=atmega32u4 -o wusel.elf wusel.o
 
-clock1.hex: clock1.elf
-#	avr-objcopy -O ihex -R .eeprom clock1.elf clock1.hex
-compile: wusel.hex
+wusel.hex: wusel.elf
+#	avr-objcopy -O ihex -R .eeprom wusel.elf wusel.hex
+compile: wusel.hex	
+#compile,the variable that the file can be called by
+#-c which programmer is used to flash the hardware
 	avrdude -c flash:w:wusel.hex 
