@@ -5,6 +5,7 @@
 
 
 void blink();
+void blinkTimes(int time);
 void setup();
 void hello(int times);
 void main(void){
@@ -21,11 +22,11 @@ void main(void){
 	int bottomLightSensor;
 	int gyro; 
 	setup();
-	//blink();
-  hello(20);
+	
 	while(1){
 	// code to runn in loop.
-	
+	blinkTimes(50);
+	hello(20);
 	}
 
 }
@@ -44,7 +45,8 @@ void setup(){
 	DDRD = (1<<DDD5);	
 	
 	//servo setup, fast PWM or mode 14 for all hardware PWM pins
-	TCCR1A = (1<< WGM11) | (1<< COM1A1) | (1<<COM1A1);
+
+	TCCR1A = (1<< COM1A1)| (1<< WGM11); 
 	TCCR1B = (1<< WGM12) | (1<<WGM13) ;
 	
 	TCCR3A = (1<< WGM31) | (1<<COM3A1);
@@ -65,7 +67,7 @@ void blink(){
 /* turn the led lights on and off. test to see if the bits are enabled
 	 and the flashing of the controller works*/
 	 while(1){ 
-	 	_delay_ms(200);
+	 	_delay_ms(300);
 	 	PORTD = (1<< PD5);
 	 	PORTC= (1<< PC7);
 	 	_delay_ms(200);
@@ -82,4 +84,16 @@ void blink(){
 			_delay_ms(250);			
 			counter++;
 		}
+	}
+	void blinkTimes(int time){
+	int counter;
+	for(counter=0; counter<=time; counter++){
+		_delay_ms(300);
+	 	PORTD = (1<< PD5);
+	 	PORTC= (1<< PC7);
+	 	_delay_ms(200);
+	 	PORTC= (0<< PC7);
+	 	PORTD= (0<<PD5);
+	
+	}
 	}
