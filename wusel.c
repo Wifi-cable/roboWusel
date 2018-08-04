@@ -13,6 +13,7 @@
 #define rightBackLeg 	OCR1C
 #define leftBackLeg   OCR3A
 
+
 void blink();
 void blinkTimes(int time);
 void setup();
@@ -36,15 +37,12 @@ void main(void){
 	int bottomLightSensor;
 	int gyro; 
 	
+	sei();
+	blink();
  	spikesSetup();
- 	_delay_ms(2000);
-	openEyes();
-	_delay_ms(2000);
+ 
 	while(1){
-	// code to runn in loop.
-	blinkTimes(20);
-	_delay_ms(2000);
-	//hello(20);
+
 	}
 
 }
@@ -107,17 +105,12 @@ void spikesSetup(){
 	}
 
 void blink(){
+/* blink init is timer init*/
+	TCCR0B = (1<<CS02) | (1<<CS00);	//prescaler 1024
+	TIMSK0 |= (1<<TOIE0);	//timer counter over flow is enabled
+	TCNT0 = 0;	//timer starts at zero
+	PORTD |= (1 << leftEye);
 
-/* turn the led lights on and off. test to see if the bits are enabled
-	 and the flashing of the controller works*/
-	 while(1){ 
-	 	_delay_ms(300);
-	 	PORTD = (1<< leftEye);
-	 	PORTC = (1<< rightEye);
-	 	_delay_ms(200);
-	 	PORTC = (0<< rightEye);
-	 	PORTD = (0<<leftEye);
-	 }
 }
 	void hello(int times){
 		int counter=0;
@@ -132,13 +125,6 @@ void blink(){
 	void blinkTimes(int time){
 	int counter = 0;
 	while( counter<time){
-	/*	_delay_ms(300);
-	 	PORTD = (1<< PD5);
-	 	PORTC = (1<< PC7);
-	 	_delay_ms(200);
-	 	PORTC = (0<< PC7);
-	 	PORTD = (0<<PD5);
-	*/
 		_delay_ms(250);
 		PORTC ^= (1 << rightEye);
 		PORTD ^= (1 << leftEye);
@@ -208,4 +194,14 @@ void blink(){
 		//pause
 		// slowly set back legs to? 
 		}
-	
+		/*interrupt service routine that makes the eyes blink twice per second. 
+		(16 000 000 /1024)/ 256 = 60 hz. 60*30 so they togle every half second */
+	ISR(TIMER0_OVF_vect) {
+	static uint8_t overflow;
+	overflow++;
+	if(overflow>=30){
+		PORTC ^= (1 << rightEye);
+		PORTD ^= (1 << leftEye);
+		overflow = 0;
+		}
+	}
