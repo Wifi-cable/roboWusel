@@ -14,8 +14,8 @@
 #define leftBackLeg     OCR3A
 
 struct legg{
-	int angel; 
-	int speed;
+	int finalPosition;
+	int singleStep;
 	uint8_t legID; //1,2,3,4
 	};
 
@@ -27,7 +27,7 @@ void setup();
 void hello(int times);
 void spikesSetup();
 void wakeUp();
-uint16_t setLeg(int leg, int speed, int degree);
+void setLegPos(struct legg* thatLeg , int oneStep, int finalPos);
 void walk();
 
 
@@ -107,33 +107,13 @@ void timerInit(){
 	PORTD |= (1 << leftEye);
 
 }
-// TODO 
-/* 
-	find a way to set the delay value.
-	pointer? 
-	rename speed  variable in struct? 
-	global delay variable? 
-	work with pointers?	
-	*/
-	uint16_t setLeg(int legId, int speed, int degree){
-		uint16_t ocr;
-		int zeroPos;//leg is high in the air
-		int singleStep = 0; //how far will leg servo move in one ISR cycle?
-		switch(speed){
-
-		/*does this make sense?  the servo position is always relative to the zero position in this
-		setup.  +5° is not possible this way. . 
-		*/
-		if((legId == 1)||(legId == 3) ){	//servos and therefore leggs are mirrored on robot
-			zeroPos = 4000;
-			ocr= zeroPos - (singleStep * 11);	
-		}
-		else{
-			zeroPos = 2000;
-			ocr= zeroPos + (singleStep * 11);
-		}
-		return ocr;
-	
+/*setter for the legs, that takes a position to increment the leg position,
+ * and a goal or final position the leg should be in. this makes up the position and speed of movement.
+ * if the leg should move backward set a negative final position and increment.
+ * */
+	setLegPos(struct legg* thatLeg , int oneStep, int finalPos){
+		thatLeg-> finalPosition = (finalPos*11);
+		thatLeg-> singleStep = (oneStep*11);
 	}
 	
 	
@@ -178,10 +158,18 @@ void timerInit(){
 	if((ms250 % 100)== 0 ){
 		ms10++;
 
-		if(on<20){
-			on++;
-		}
 	}
+	int zeroPos;//leg is high in the air
+	//put in ISR
+	if((legId == 1)||(legId == 3) ){	//servos and therefore leggs are mirrored on robot
+		zeroPos = 4000;
+		ocr= zeroPos - (singleStep * 11);
+	}
+	else{
+		zeroPos = 2000;
+		ocr= zeroPos + (singleStep * 11);
+	}
+
 	/*if(ms500 >= speed){	// does not work, because it would set the legs many times afer a delay. must resett 
 	the counter after each time. use differnet counter variable?
 		set servos
