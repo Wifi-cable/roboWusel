@@ -12,7 +12,6 @@ struct legg{
 	uint16_t zeroPosition;
 	int finalPosition;
 	int singleStep;
-	uint8_t legID; //1,2,3,4
 	};
 
 int mode;
@@ -42,18 +41,10 @@ void main(void){
 	int topLightSensor;
 	int bottomLightSensor;
 	
-
-
-	
+//default positions or zeroPosition is mirrored
 	rightFront.zeroPosition = 4000;
-
-	
 	leftFront.zeroPosition = 2000;
-
-	
 	rightBack.zeroPosition = 4000;
-
-	
 	leftBack.zeroPosition = 2000;
 
 	
@@ -62,24 +53,11 @@ void main(void){
  	spikesSetup();
 
 
-/*	while(1){
-		blinkTimes(2);
-		_delay_ms(2000);
-		setLegPos(&leftFront, 10, 1);
-		_delay_ms(2000);
-		setLegPos(&leftFront, -10, 160);
-		_delay_ms(2000);
-		setLegPos(&leftFront, 10, 1);
-		_delay_ms(2000);
-		setLegPos(&leftFront, -10, 160);
-	}
-*/
 	while(1){
 		wakeUp();
 
-		_delay_ms(1000);
+		_delay_ms(5000);
 		sleep(2000);
-
 
 	}
 
@@ -104,6 +82,7 @@ void spikesSetup(){
         // put all legs in zero position
       OCR1A = rightFront.zeroPosition;
 	  OCR1B	= leftFront.zeroPosition;
+
 	  OCR1C	= rightBack.zeroPosition;
 	  OCR3A = leftBack.zeroPosition;
 
@@ -133,35 +112,37 @@ void timerInit(){
 	void wakeUp(){
 		blinkTimes(3);
 		_delay_ms(50);
-		setLegPos(&rightFront, 1, 90);
-		setLegPos(&leftFront, 1, 90);
-		_delay_ms(550);
-		setLegPos(&rightBack, 2, 90);
-		setLegPos(&leftBack, 2, 90);
+		setLegPos(&rightFront, -1, 10);// leg down
+		setLegPos(&leftFront, -1, 150);	// leg down
+		_delay_ms(2000);
+		setLegPos(&rightBack, -1, 10); // leg down
+		setLegPos(&leftBack, -1, 150);// leg down
 		_delay_ms(250);
 		PORTC = (1 << rightEye);
 		PORTD = (1 << leftEye);
-		blinkTimes(6);
-		PORTC = (1 << rightEye);
-		PORTD = (1 << leftEye);
+		blinkTimes(10);
+		PORTC = (0 << rightEye);
+		PORTD = (0 << leftEye);
 	}
 
 	void sleep(int time){
 		int cnt;
-		setLegPos(&rightBack, -2, 0);
-		setLegPos(&leftBack, -2,  181);
+
+		setLegPos(&rightBack, 2, 140);// leg up
+		setLegPos(&leftBack, 2,  20);	//up
 		_delay_ms(1000);
-		setLegPos(&rightFront, -2, 0);
-		setLegPos(&leftFront, -2, 181);
-		_delay_ms(100);
-		PORTC = (0 << rightEye);
-		PORTD = (0 << leftEye);
+		setLegPos(&rightFront, 2, 140);	// up
+		setLegPos(&leftFront, 2, 20);	// up
+		_delay_ms(300);
+		PORTC = (1 << rightEye);
+		PORTD = (1 << leftEye);
 		for(cnt = 0; cnt<time; cnt++){
 		_delay_ms(1);
 		}
 
 	}
 	void walk(){
+
 
 	//set legs to walk straight 1,4,2,3 ? 
 	}
@@ -201,7 +182,6 @@ void timerInit(){
 	
 
 	if((ms250 % 10)== 0 ){
-
 			// 4000 to 2000 (invers)
 			if((rightFront.finalPosition>=0)&&(rightFront.finalPosition<=2000)){// if not out of rage
 
@@ -211,7 +191,7 @@ void timerInit(){
 					}
 				}
 
-				else{// move down
+				else{// move up
 					if(rightFront.finalPosition < (currentPos1 - 2000)){
 						OCR1A =  OCR1A + rightFront.singleStep;
 					}
@@ -220,14 +200,15 @@ void timerInit(){
 			//repeat different leg. added instead of subtract, because the legg is not mirrored
 			if((leftFront.finalPosition>=0)&&(leftFront.finalPosition<=2000)){// if not out of rage
 
-				if(leftFront.singleStep>0)	{//move up
+				if(leftFront.singleStep>0)	{//move down
 					if(leftFront.finalPosition < (currentPos2 - leftFront.zeroPosition)){
 						OCR1B =  OCR1B - leftFront.singleStep;
 					}
 			}
 
-			else{// move down
-				if(leftFront.finalPosition > (currentPos2  - leftFront.zeroPosition)){
+			else{// move up
+				if(leftFront.finalPosition >
+					(currentPos2  - leftFront.zeroPosition)){
 				OCR1B =  OCR1B - leftFront.singleStep;
 				}
 			}
@@ -235,28 +216,28 @@ void timerInit(){
 			//mirrored leg
 			if((rightBack.finalPosition>=0)&&(rightBack.finalPosition<=2000)){// if not out of rage
 
-							if(rightBack.singleStep>0)	{//move up
+							if(rightBack.singleStep>0)	{//move down
 								if(rightBack.finalPosition > (currentPos3- 2000)){
 									OCR1C =  OCR1C +rightBack.singleStep;
 								}
 						}
 
-						else{// move down
+						else{// move up
 							if(rightBack.finalPosition < (currentPos3- 2000)){
 							OCR1C =  OCR1C + rightBack.singleStep;
 							}
 						}
 					}
 
-		if((leftBack.finalPosition>0)&&(leftBack.finalPosition<2000)){// if not out of rage
+		if((leftBack.finalPosition>=0)&&(leftBack.finalPosition<=2000)){// if not out of rage
 
-				if(leftBack.singleStep>0)	{//move up
+				if(leftBack.singleStep>0)	{//move leg down
 					if(leftBack.finalPosition < (currentPos4 - leftBack.zeroPosition)){
 						OCR3A =  OCR3A -leftBack.singleStep;
 					}
 			}
 
-			else{// move down
+			else{// move leg up
 				if(leftBack.finalPosition > (currentPos4 - leftBack.zeroPosition)){
 				OCR3A =  OCR3A - leftBack.singleStep;
 				}
@@ -267,8 +248,6 @@ void timerInit(){
 	ms250++;
 	if(ms250 >=250){
 		ms500++;
-		ms250=0; 
-		
+		ms250=0;
 	}
-	
 	}
