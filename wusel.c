@@ -55,7 +55,8 @@ void main(void){
 
 	while(1){
 		wakeUp();
-
+		_delay_ms(500);
+		hello(10);
 		_delay_ms(5000);
 		sleep(2000);
 
@@ -113,10 +114,10 @@ void timerInit(){
 		blinkTimes(3);
 		_delay_ms(50);
 		setLegPos(&rightFront, -1, 10);// leg down
-		setLegPos(&leftFront, -1, 150);	// leg down
+		setLegPos(&leftFront, -1, 170);	// leg down
 		_delay_ms(2000);
 		setLegPos(&rightBack, -1, 10); // leg down
-		setLegPos(&leftBack, -1, 150);// leg down
+		setLegPos(&leftBack, -1, 170);// leg down
 		_delay_ms(250);
 		PORTC = (1 << rightEye);
 		PORTD = (1 << leftEye);
@@ -150,12 +151,14 @@ void timerInit(){
 	void hello(int times){
 		int counter = 0;
 		while(counter < times){
-			OCR1A = 2000; 
+
+			setLegPos(&rightFront, -5, 20);
 			_delay_ms(250);
-			OCR1A = 2000+ 1000; 
-			_delay_ms(250);			
+			setLegPos(&rightFront, 5, 180);
+			_delay_ms(250);
 			counter++;
 		}
+		setLegPos(&rightFront, -3, 10);
 	}
 	
 	void blinkTimes(int time){
