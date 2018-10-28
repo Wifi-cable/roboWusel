@@ -16,7 +16,7 @@ struct legg{
 	int finalPosition;
 	int singleStep;
 	};
-
+volatile uint8_t flag =0;
 int mode;
 volatile int roboWalk;
 volatile uint8_t delay = 0;
@@ -292,6 +292,9 @@ int currentPos4 = OCR3A;
 
 
 if((ms250 % 10)== 0 ){
+		if (leftwisker|| rightwisker){
+			flag = 1;
+		}
 		// 4000 to 2000 (invers)
 		if((rightFront.finalPosition>=0)&&(rightFront.finalPosition<=2000)){// if not out of rage
 
@@ -426,12 +429,18 @@ if(ms250 >=250){
 		}
 	}
 	void stop(){
-		if (leftwisker || rightwisker){
+		if (flag){
 			blinkTimes(4);
 			walk3(5);
-
+			flag = 0;
 		}
 		else{
 			walk(1);
 		}
 	}
+	/*
+	 * let ISR check  every 10 ms if a button was pressed.
+	 * if so, set a flag.
+	 * after each step check for flag
+	 * if flag, walk backwards set flag to zero.
+	 * */
