@@ -1,4 +1,4 @@
-#include <avr/io.h>	//avr input output 
+#include <avr/io.h>	//avr input output
 #include <avr/interrupt.h> 	// intterupts instead of delay
 #include <util/delay.h>
 
@@ -10,6 +10,31 @@
 
 #define rightEye PC7
 #define leftEye PD5
+ /*int sinArray[] = {3000, 3105, 3208, 3309, 3407, 3500, 3588, 3669, 3743, 3809, 3866, 3914, 3951, 3978, 3995, 4000, 3995, 3978, 3951,
+	  3914, 3866, 3809, 3743, 3669, 3588, 3500, 3407, 3309, 3208, 3105, 3000, 2895, 2792, 2691, 2593,2500, 2412, 2331, 2257,
+		2191, 2134, 2086, 2049, 2022, 2005, 2000, 2005, 2022, 2049, 2086, 2134, 2191, 2257, 2331, 2412, 2500, 2593, 2691, 2792, 2895};
+ int cosinArray[] ={4000, 3995, 3978, 3951, 3914, 3866, 3809, 3743, 3669, 3588, 3500, 3407, 3309, 3208, 3105, 3000, 2895, 2792, 2691,
+	  2593, 2500, 2412, 2331, 2257, 2191, 2134, 2086, 2049, 2022, 2005, 2000, 2005, 2022, 2049, 2086, 2134, 2191, 2257, 2331, 2412, 2500,
+		2593, 2691, 2792, 2895, 3000, 3105, 3208, 3309, 3407, 3500, 3588, 3669, 3743, 3809, 3866, 3914, 3951, 3978, 3995};
+		*/
+		int sinArray [] = {500, 517, 535, 552, 570, 587, 604, 621, 638, 655, 671, 687, 703, 719, 735, 750, 765, 780,
+			 794, 808, 821, 835, 847, 860, 872, 883, 894, 905, 915, 924, 933, 941, 949, 957, 964, 970, 976, 981, 985,
+			  989, 992, 995, 997, 999, 1000, 1000, 1000, 999, 997, 995, 992, 989, 985, 981, 976, 970, 964, 957, 949,
+				941, 933, 924, 915, 905, 894, 883, 872, 860, 847, 835, 821, 808, 794, 780, 765, 750, 735, 719, 703, 687,
+			  671, 655, 638, 621, 604, 587, 570, 552, 535, 517, 500, 483, 465, 448, 430, 413, 396, 379, 362, 345,
+			  329, 313, 297, 281, 265, 250, 235, 220, 206, 192, 179, 165, 153, 140, 128, 117, 106, 95, 85, 76, 67,
+				59, 51, 43, 36, 30, 24, 19, 15, 11, 8, 5, 3, 1, 0, 0, 0, 1, 3, 5, 8, 11, 15, 19, 24, 30, 36, 43, 51, 59,
+				67, 76, 85, 95, 106, 117, 128, 140, 153, 165, 179, 192, 206, 220, 235, 250, 265, 281, 297, 313, 329, 345,
+				362, 379, 396, 413, 430, 448, 465, 483};
+
+		int cosinArray[] ={1000, 1000, 999, 997, 995, 992, 989, 985, 981, 976, 970, 964, 957, 949, 941, 933, 924, 915, 905,
+			 894, 883, 872, 860, 847, 835, 821, 808, 794, 780, 765, 750, 735, 719, 703, 687, 671, 655, 638, 621, 604, 587,
+			 570, 552, 535, 517, 500, 483, 465, 448, 430, 413, 396, 379, 362, 345, 329, 313, 297, 281, 265, 250, 235, 220, 206,
+			 192, 179, 165, 153, 140, 128, 117, 106, 95, 85, 76, 67, 59, 51, 43, 36, 30, 24, 19, 15, 11, 8, 5, 3, 1, 0, 0, 0,
+			 1, 3, 5, 8, 11, 15, 19, 24, 30, 36, 43, 51, 59, 67, 76, 85, 95, 106, 117, 128, 140, 153, 165, 179, 192, 206, 220,
+			 235, 250, 265, 281, 297, 313, 329, 345, 362, 379, 396, 413, 430, 448, 465, 483, 500, 517, 535, 552, 570, 587, 604,
+			  621, 638, 655, 671, 687, 703, 719, 735, 750, 765, 780, 794, 808, 821, 835, 847, 860, 872, 883, 894, 905, 915,
+				924, 933, 941, 949, 957, 964, 970, 976, 981, 985, 989, 992, 995, 997, 999, 1000};
 
 struct legg{
 	uint16_t zeroPosition;
@@ -42,6 +67,7 @@ void rightWalk(int steps);
 void timerWalk( int step, int speed);
 void stop();
 
+
 void main(void){
 
 	int leftWisker;
@@ -50,14 +76,14 @@ void main(void){
 	int infraredSensor;
 	int topLightSensor;
 	int bottomLightSensor;
-	
+
 //default positions or zeroPosition is mirrored
 	rightFront.zeroPosition = 4000;
 	leftFront.zeroPosition = 2000;
 	rightBack.zeroPosition = 4000;
 	leftBack.zeroPosition = 2000;
 
-	
+
 
 	timerInit();
  	spikesSetup();
@@ -66,12 +92,10 @@ void main(void){
 	wakeUp();
 	_delay_ms(500);
 	hello(3);
-	_delay_ms(500);
-	delay = 200;
 
 	while(1){
+		timerWalk( 1, 1);
 
-		stop();
 	}
 
 }
@@ -81,15 +105,15 @@ void spikesSetup(){
 			DDRB = (1<<DDB7) | 	(1<<DDB6) |	 (1<<DDB5) | 	(1<< DDB4); // servo motor output enabled
 			//DDC6 = backLeftServo
 			//DDC7 = LEDright
-			DDRC = (1<<DDC7) | (1<<DDC6); 
+			DDRC = (1<<DDC7) | (1<<DDC6);
 			//DDD5 = LEDleft
-			DDRD = (1<<DDD5);	
-					
+			DDRD = (1<<DDD5);
+
        TCCR1A = ((1<<COM1A1) | (0<<COM1A0) | (1<<COM1B1) | (0<<COM1B0) | (1<<COM1C1) | (0<<COM1C0) | (1<<WGM11) | (0<<WGM10));
        TCCR1B = ((0<<ICNC1) | (0<<ICES1) | (0<<PIN5) | (1<<WGM13) | (1<<WGM12)| (0<<CS12) | (1<<CS11) | (0<<CS10));
-        
-        ICR1   = 40000; // Periode 	
-        
+
+        ICR1   = 40000; // Periode
+
        TCCR3A = ((1<<COM1A1) | (0<<COM1A0) | (1<<COM1B1) | (0<<COM1B0) | (1<<COM1C1) | (0<<COM1C0) | (1<<WGM11) | (0<<WGM10));
        TCCR3B = ((0<<ICNC1) | (0<<ICES1) | (0<<PIN5) | (1<<WGM13) | (1<<WGM12)| (0<<CS12) | (1<<CS11) | (0<<CS10));
         // put all legs in zero position
@@ -99,8 +123,8 @@ void spikesSetup(){
 	  OCR1C	= rightBack.zeroPosition;
 	  OCR3A = leftBack.zeroPosition;
 
-        
-        ICR3   = 40000; // Periode 	
+
+        ICR3   = 40000; // Periode
 	}
 
 
@@ -111,7 +135,7 @@ void timerInit(){
 	TCCR0B = (1<<CS01) | (1<<CS00) | (1<<WGM02);	//prescaler 64
 	TIMSK0 |= (1<<TOIE0);	//timer counter over flow is enabled
 	TCCR0A |= (1<<WGM01)| (1<<WGM00);
-	OCR0A = 249; 
+	OCR0A = 249;
 	TCNT0 = 0;	//timer starts at zero
 	PORTD |= (1 << leftEye);
 
@@ -124,7 +148,7 @@ void timerInit(){
 		thatLeg-> finalPosition = (finalPos*11);
 		thatLeg-> singleStep = (oneStep*11);
 	}
-	
+
 	void wakeUp(){
 		blinkTimes(3);
 		_delay_ms(50);
@@ -268,7 +292,7 @@ void timerInit(){
 		}
 		setLegPos(&rightFront, -3, 10);
 	}
-	
+
 	void blinkTimes(int time){
 	int counter = 0;
 	while( counter<time){
@@ -292,6 +316,7 @@ int currentPos4 = OCR3A;
 
 
 if((ms250 % 10)== 0 ){
+	//delay = 1;	//too fast
 		if (leftwisker|| rightwisker){
 			flag = 1;
 		}
@@ -357,6 +382,9 @@ if((ms250 % 10)== 0 ){
 		}
 	}
 }	//end %10
+if((ms250 % 25) ==0){
+	delay=1;
+}
 
 ms250++;
 if(ms250 >=250){
@@ -390,44 +418,47 @@ if(ms250 >=250){
 		}
 	}
 
+/* this method uses the huge global arrays that translate sin wave and cosin wave into integer large
+integer values and a timer to walk forward or backward.
+*/
+	void timerWalk( int forward, int speed){
 
-	void timerWalk( int step, int speed){
-		uint8_t increment = 11; // 11 is one degree, 22 is two degrees
-		uint8_t stepOne = 0;
-		int up;
-		/*needs to get indo walking position /-\ one legg up oposite legg down. 
-		than it needs to check if   */
-		//links vorne hoch
-		// rechts hinten hoch
-		/* 	int currentPos1 = OCR1A;
-		int currentPos2 = OCR1B;
-		int currentPos3	= OCR1C;
-		int currentPos4 = OCR3A;
-		
-		
-	rightFront;	//yellow servo mirrored
-	leftFront;
-  rightBack;	//mirrored
-	leftBack;
-		*/
-		//setLegPos(&leftFront 10, 140);	// up
-		//setLegPos(&rightBack 10, 20);	  //	up
-		
+		static uint8_t sinPos; // arraypointer for sinus array
+		static uint8_t cosPos; // arraypointer for cosinArray
 		if(delay){
-			//increment legg, unless it needs to be decremented.  but how to know? 
-			if(stepOne   ){
-				
-				
-				up = 0;
+			if(forward){// move forward
+				OCR1A = (sinArray[sinPos]) + 2000;
+				OCR1B = (sinArray[sinPos]) + 3000;
+				OCR1C = (cosinArray[cosPos]) + 2000;
+				OCR3A = (cosinArray[cosPos]) + 3000;
+
+				sinPos = (sinPos -speed);
+				if (sinPos>181) {
+					sinPos = 179;
+				}
+
+				cosPos = (cosPos -speed);
+				if (cosPos>181) {
+					cosPos = 179;
+				}
 			}
-			
-			else{
-			
-			
-				up = 1;
+
+			else{	// backwards
+				OCR1A= (sinArray[sinPos]) + 2000;
+				OCR1B= (sinArray[sinPos]) + 3000;
+				OCR1C= cosinArray[cosPos] + 2000;
+				OCR3A= cosinArray[cosPos] + 3000;
+
+				sinPos= (sinPos +speed)%180;
+				cosPos= (cosPos +speed)%180;
+
 			}
+			//move
+			delay = 0;
 		}
-	}
+	}// end timerWalk
+
+
 	void stop(){
 		if (flag){
 			blinkTimes(4);
