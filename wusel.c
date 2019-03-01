@@ -10,13 +10,7 @@
 
 #define rightEye PC7
 #define leftEye PD5
- /*int sinArray[] = {3000, 3105, 3208, 3309, 3407, 3500, 3588, 3669, 3743, 3809, 3866, 3914, 3951, 3978, 3995, 4000, 3995, 3978, 3951,
-	  3914, 3866, 3809, 3743, 3669, 3588, 3500, 3407, 3309, 3208, 3105, 3000, 2895, 2792, 2691, 2593,2500, 2412, 2331, 2257,
-		2191, 2134, 2086, 2049, 2022, 2005, 2000, 2005, 2022, 2049, 2086, 2134, 2191, 2257, 2331, 2412, 2500, 2593, 2691, 2792, 2895};
- int cosinArray[] ={4000, 3995, 3978, 3951, 3914, 3866, 3809, 3743, 3669, 3588, 3500, 3407, 3309, 3208, 3105, 3000, 2895, 2792, 2691,
-	  2593, 2500, 2412, 2331, 2257, 2191, 2134, 2086, 2049, 2022, 2005, 2000, 2005, 2022, 2049, 2086, 2134, 2191, 2257, 2331, 2412, 2500,
-		2593, 2691, 2792, 2895, 3000, 3105, 3208, 3309, 3407, 3500, 3588, 3669, 3743, 3809, 3866, 3914, 3951, 3978, 3995};
-		*/
+
 		int sinArray [] = {500, 517, 535, 552, 570, 587, 604, 621, 638, 655, 671, 687, 703, 719, 735, 750, 765, 780,
 			 794, 808, 821, 835, 847, 860, 872, 883, 894, 905, 915, 924, 933, 941, 949, 957, 964, 970, 976, 981, 985,
 			  989, 992, 995, 997, 999, 1000, 1000, 1000, 999, 997, 995, 992, 989, 985, 981, 976, 970, 964, 957, 949,
@@ -60,12 +54,11 @@ void wakeUp();
 void setLegPos(struct legg* thatLeg , int oneStep, int finalPos);
 void walk(int far);
 void walk1(int step);
-void walk2(int step);
 void walk3(int step);
 void sleep(int time);
-void rightWalk(int steps);
 void timerWalk( int step, int speed);
 void stop();
+void LegInit();
 
 
 void main(void){
@@ -90,11 +83,19 @@ void main(void){
 	sei();
 
 	wakeUp();
-	_delay_ms(500);
-	hello(3);
+	//_delay_ms(500);
+	//hello(3);
+	blinkTimes(6);
 
 	while(1){
-		timerWalk( 1, 1);
+		timerWalk( 1, 7);
+	//	blinkTimes(3);
+		//timerWalk( 1, 1);
+//timerwalk works, but i need to implement a backward variety
+// also a variety with "how many steps"
+// so i can make him stop and back up.
+
+// remove all other walk methods. github still has them afterall.
 
 	}
 
@@ -205,29 +206,17 @@ void timerInit(){
 	step--;
 		}
 	}
-	void walk2(int step){	// sucks
-		while (step){
 
+	void LegInit(){
+		setLegPos(&rightFront, -7, 90);// leg down
+		_delay_ms(10);
+		setLegPos(&leftBack, -7, 90);// leg down
+		_delay_ms(10);
+		setLegPos(&leftFront, -7, 90);	// leg down
+		_delay_ms(10);
+		setLegPos(&rightBack, -7, 90); // leg down
+		_delay_ms(10);
 
-	setLegPos(&leftFront, 7, 40);	// up
-	_delay_ms(100);
-	setLegPos(&rightBack, 7, 140);// leg up
-	_delay_ms(100);
-	setLegPos(&leftFront, -7, 75);	// leg down
-	_delay_ms(100);
-	setLegPos(&rightBack, -7,5); // leg down
-	_delay_ms(100);
-	setLegPos(&rightFront, 7, 140);	// up
-	_delay_ms(100);
-	setLegPos(&leftBack, 7, 40);	//up
-	_delay_ms(100);	//next step
-	setLegPos(&rightFront, -7, 5);// leg down
-	_delay_ms(100);
-	setLegPos(&leftBack, -7, 175);// leg down
-	_delay_ms(100);
-
-	step--;
-		}
 	}
 	void walk3(int step){
 		while (step){
@@ -253,29 +242,7 @@ void timerInit(){
 	step--;
 		}
 	}
-	void rightWalk(int steps){	// does NOT work this way
-		while (steps){
-			setLegPos(&rightFront, 4, 160);	// up
-			_delay_ms(60);
-			setLegPos(&rightBack, 4, 160);// leg up
-			_delay_ms(160);
-			setLegPos(&rightFront, -4, 0);// leg down
-			_delay_ms(60);
-			setLegPos(&rightBack, -4,0); // leg down
-			//right side moved now left
-			_delay_ms(160);
-			setLegPos(&leftFront, 3, 60);	// up
-			_delay_ms(50);
-			setLegPos(&leftBack, 3,  60);	//up
-			_delay_ms(150);
-			setLegPos(&leftFront, -3, 160);	// leg down
-			_delay_ms(50);
-			setLegPos(&leftBack, -3, 180);// leg down
-			_delay_ms(150);
-	steps--;
-		}
-		return;
-	}
+
 	/* make a different walk method that  uses both legs as -- one line,  than move them continously.  but how to move all 4 at once?
 	 * do math to set them all, do not set per set per reglular set leg method.  have delay as a parameter. */
 
@@ -427,27 +394,28 @@ integer values and a timer to walk forward or backward.
 		static uint8_t cosPos; // arraypointer for cosinArray
 		if(delay){
 			if(forward){// move forward
-				OCR1A = (sinArray[sinPos]) + 2000;
-				OCR1B = (sinArray[sinPos]) + 3000;
-				OCR1C = (cosinArray[cosPos]) + 2000;
-				OCR3A = (cosinArray[cosPos]) + 3000;
 
+				OCR1A = (sinArray[cosPos]) + 2000;
+				OCR1B = (sinArray[cosPos]) + 3000;
+				OCR1C = (cosinArray[sinPos]) + 2000;
+				OCR3A = (cosinArray[sinPos]) + 3000;
+				//dirty array out of bounds prevention
 				sinPos = (sinPos -speed);
-				if (sinPos>181) {
-					sinPos = 179;
+				if (sinPos>160) {
+					sinPos = 160;
 				}
 
 				cosPos = (cosPos -speed);
-				if (cosPos>181) {
-					cosPos = 179;
+				if (cosPos>160) {
+					cosPos = 160;
 				}
 			}
 
 			else{	// backwards
-				OCR1A= (sinArray[sinPos]) + 2000;
-				OCR1B= (sinArray[sinPos]) + 3000;
-				OCR1C= cosinArray[cosPos] + 2000;
-				OCR3A= cosinArray[cosPos] + 3000;
+				OCR1A= (sinArray[cosPos]) + 2000;
+				OCR1B= (sinArray[cosPos]) + 3000;
+				OCR1C= cosinArray[sinPos] + 2000;
+				OCR3A= cosinArray[sinPos] + 3000;
 
 				sinPos= (sinPos +speed)%180;
 				cosPos= (cosPos +speed)%180;
